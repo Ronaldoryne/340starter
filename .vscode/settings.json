@@ -1,0 +1,16 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": true
+                }
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "name": "ryne12",
+            "connectString": "postgresql://ryne12:gfkRYMsXAMu1Dj09879ok1UsHo0glDCp@dpg-d1lccore5dus73fhtj4g-a.oregon-postgres.render.com/ryne12"
+        }
+    ]
+}
