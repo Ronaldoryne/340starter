@@ -5,6 +5,8 @@
 /* ***********************
  * Require Statements
  *************************/
+const inventoryRoute = require("./routes/inventoryRoute");
+const baseController = require("./controllers/baseController")
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
 const env = require("dotenv").config()
@@ -24,15 +26,10 @@ app.set("layout", "./layouts/layout") // not at views root
 app.use(static)
 
 // Index route
-app.get("/", function(req, res){
-  try {
-    res.render("index", {title: "Home"})
-  } catch (error) {
-    console.error("Error rendering index:", error)
-    res.status(500).send("Server Error: Cannot render home page")
-  }
-})
+app.get("/", baseController.buildHome);
 
+// Inventory routes
+app.use("/inv", inventoryRoute)
 /* ***********************
  * Local Server Information
  * Values from .env (environment) file
