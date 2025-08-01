@@ -1,22 +1,7 @@
-<%- include('../partials/header') %>
-
-<main>
+<% if (title) { %>
   <h1><%= title %></h1>
-  <div class="vehicle-grid">
-    <% vehicles.forEach(vehicle => { %>
-      <div class="vehicle-card">
-        <a href="/inv/detail/<%= vehicle.inv_id %>">
-          <img src="<%= vehicle.inv_thumbnail %>" alt="<%= vehicle.inv_make %> <%= vehicle.inv_model %> Thumbnail">
-        </a>
-        <div class="card-info">
-          <h3><%= vehicle.inv_make %> <%= vehicle.inv_model %></h3>
-          <p><strong>Price:</strong> 
-            <%= new Intl.NumberFormat('en-US', { style:'currency', currency:'USD' }).format(vehicle.inv_price) %>
-          </p>
-        </div>
-      </div>
-    <% }) %>
-  </div>
-</main>
+<% } else { %>
+  <h1>Vehicle Classification</h1>
+<% } %>
 
-<%- include('../partials/footer') %>
+<%- grid %>

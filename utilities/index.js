@@ -5,26 +5,29 @@ const Util = {}
  * Constructs the nav HTML unordered list
  ************************** */
 Util.getNav = async function (req, res, next) {
-  let data = await invModel.getClassifications()
-  let list = "<ul>"
-  list += '<li><a href="/" title="Home page">Home</a></li>'
-  data.rows.forEach((row) => {
-    list += "<li>"
-    list +=
-      '<a href="/inv/type/' +
-      row.classification_id +
-      '" title="See our inventory of ' +
-      row.classification_name +
-      ' vehicles">' +
-      row.classification_name +
-      "</a>"
-    list += "</li>"
-  })
-  list += "</ul>"
-  return list
+  try {
+    let data = await invModel.getClassifications()
+    let list = "<ul>"
+    list += '<li><a href="/" title="Home page">Home</a></li>'
+    data.rows.forEach((row) => {
+      list += "<li>"
+      list +=
+        '<a href="/inv/type/' +
+        row.classification_id +
+        '" title="See our inventory of ' +
+        row.classification_name +
+        ' vehicles">' +
+        row.classification_name +
+        "</a>"
+      list += "</li>"
+    })
+    list += "</ul>"
+    return list
+  } catch (error) {
+    console.error("getNav error:", error)
+    throw error
+  }
 }
-
-
 
 /* **************************************
 * Build the classification view HTML
@@ -60,10 +63,53 @@ Util.buildClassificationGrid = async function(data){
 }
 
 /* ****************************************
- * Middleware For Handling Errors
- * Wrap other function in this for 
- * General Error Handling
+ * Build vehicle detail HTML
  **************************************** */
-Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+Util.buildVehicleDetailHTML = async function(vehicle) {
+  let detailHTML = ""
+  if (vehicle) {
+    detailHTML += `
+    <div class="vehicle-detail">
+      <div class="vehicle-image">
+        <img src="${vehicle.inv_image}" 
+             alt="Image of ${vehicle.inv_make} ${vehicle.inv_model} on CSE Motors" 
+             loading="lazy">
+      </div>
+      <div class="vehicle-info">
+        <h2>${vehicle.inv_make} ${vehicle.inv_model} Details</h2>
+        <div class="price-section">
+          <p class="price"><strong>Price: ${new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+          }).format(vehicle.inv_price)}</strong></p>
+        </div>
+        <div class="vehicle-specs">
+          <p><strong>Year:</strong> ${vehicle.inv_year}</p>
+          <p><strong>Make:</strong> ${vehicle.inv_make}</p>
+          <p><strong>Model:</strong> ${vehicle.inv_model}</p>
+          <p><strong>Mileage:</strong> ${new Intl.NumberFormat('en-US').format(vehicle.inv_miles)} miles</p>
+          <p><strong>Color:</strong> ${vehicle.inv_color}</p>
+        </div>
+        <div class="vehicle-description">
+          <h3>Description</h3>
+          <p>${vehicle.inv_description}</p>
+        </div>
+      </div>
+    </div>`
+  } else {
+    detailHTML = "<p>Sorry, no vehicle details available.</p>"
+  }
+  return detailHTML
+}
+
+/* ****************************************
+* Middleware to handle errors
+* FIXED: This function was causing the "fn is not a function" error
+**************************************** */
+Util.handleErrors = function(fn) {
+  return function(req, res, next) {
+    Promise.resolve(fn(req, res, next)).catch(next)
+  }
+}
 
 module.exports = Util
