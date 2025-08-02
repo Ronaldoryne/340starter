@@ -1,25 +1,43 @@
-
-<% if (title) { %>
-  <h1>Error <%= title %></h1>
-<% } else { %>
-  <h1>Oops! Something went wrong</h1>
-<% } %>
-
-<div class="error-container">
-  <div class="error-icon">
-    <span>⚠️</span>
-  </div>
-  
-  <% if (message) { %>
-    <p class="error-message"><%= message %></p>
-  <% } else { %>
-    <p class="error-message">An unexpected error occurred.</p>
-  <% } %>
-  
-  <p class="error-description">We apologize for the inconvenience. Please try again later or contact support if the problem persists.</p>
-  
-  <div class="error-actions">
-    <a href="/" class="btn btn-primary">Return to Home</a>
-    <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | CSE Motors</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div id="wrapper">
+        <header>
+            <%- nav %>
+        </header>
+        <main>
+            <h1>Oops! Something went wrong</h1>
+            <div class="error-content">
+                <% if (typeof error !== 'undefined' && error.status === 404) { %>
+                    <h2>Page Not Found (404)</h2>
+                    <p>Sorry, the page you are looking for doesn't exist.</p>
+                <% } else if (typeof error !== 'undefined' && error.status >= 500) { %>
+                    <h2>Server Error (<%= error.status %>)</h2>
+                    <p>We're experiencing technical difficulties. Please try again later.</p>
+                <% } else { %>
+                    <h2>Error</h2>
+                    <p>An unexpected error occurred. Please try again.</p>
+                <% } %>
+                
+                <% if (typeof error !== 'undefined' && error.message) { %>
+                    <p class="error-message"><%= error.message %></p>
+                <% } %>
+                
+                <div class="error-actions">
+                    <a href="/" class="btn">Go to Home Page</a>
+                    <a href="javascript:history.back()" class="btn">Go Back</a>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <%- include('../partials/footer') %>
+        </footer>
+    </div>
+</body>
+</html>

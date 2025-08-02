@@ -1,7 +1,10 @@
 <% if (title) { %>
-  <h1><%= title %></h1>
+  <% title %>
 <% } else { %>
-  <h1>Vehicle Details</h1>
+  <title>Vehicle Detail | CSE Motors</title>
 <% } %>
 
-<%- grid %>
+<main>
+  <h1><%= title %></h1>
+  <%- vehicleDetail %>
+</main>

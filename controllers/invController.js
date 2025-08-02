@@ -1,4 +1,3 @@
-
 const invModel = require("../models/inventory-model")
 const utilities = require("../utilities/")
 
@@ -21,34 +20,26 @@ invCont.buildByClassificationId = async function (req, res, next) {
 }
 
 /* ***************************
- *  Build inventory by inventory ID
+ *  Build vehicle detail view
  * ************************** */
-invCont.buildByInventoryId = async function (req, res, next) {
-  const inv_id = req.params.inv_id
-  const data = await invModel.getInventoryById(inv_id)
+invCont.buildByInvId = async function (req, res, next) {
+  const inv_id = req.params.invId
+  const data = await invModel.getInventoryByInvId(inv_id)
   if (data) {
-    const grid = await utilities.buildVehicleDetailHTML(data)
+    const vehicleDetail = await utilities.buildVehicleDetail(data)
     let nav = await utilities.getNav()
     const vehicleName = `${data.inv_make} ${data.inv_model}`
-    res.render("./inventory/detail", {
+    res.render("./inventory/details", {
       title: vehicleName,
       nav,
-      grid,
+      vehicleDetail,
     })
   } else {
-    const err = new Error('Vehicle not found')
-    err.status = 404
-    next(err)
+    // Vehicle not found, trigger 404 error
+    const error = new Error("Vehicle not found")
+    error.status = 404
+    throw error
   }
-}
-
-/* ***************************
- *  Intentionally trigger a 500 error
- * ************************** */
-invCont.triggerError = async function (req, res, next) {
-  const error = new Error('This is an intentional 500 error for testing purposes')
-  error.status = 500
-  throw error
 }
 
 module.exports = invCont

@@ -1,42 +1,46 @@
-/* ******************************************
- * This server.js file is the primary file of the 
- * application. It is used to control the project.
- *******************************************/
-
-/* ***********************
- * Require Statements
- *************************/
-const inventoryRoute = require("./routes/inventoryRoute");
-const baseController = require("./controllers/baseController");
-const express = require("express");
-const expressLayouts = require("express-ejs-layouts");
-const env = require("dotenv").config();
-const app = express();
-const static = require("./routes/static");
-const utilities = require("./utilities/");
+// ===== SERVER.JS COMPLETE FILE =====
+const express = require("express")
+const expressLayouts = require("express-ejs-layouts")
+const env = require("dotenv").config()
+const app = express()
+const static = require("./routes/static")
+const inventoryRoute = require("./routes/inventoryRoute")
+const utilities = require("./utilities/")
 
 /* ***********************
  * View Engine and Templates
  *************************/
-app.set("view engine", "ejs");
-app.use(expressLayouts);
-app.set("layout", "./layouts/layout"); // not at views root
+app.set("view engine", "ejs")
+app.use(expressLayouts)
+app.set("layout", "./layouts/layout") // not at views root
 
 /* ***********************
  * Routes
  *************************/
-app.use(static);
+app.use(static)
 
-// ✅ HOME ROUTE FIRST
-app.get("/", utilities.handleErrors(baseController.buildHome))
+// Index route
+app.get("/", utilities.handleErrors(async function(req, res) {
+  let nav = await utilities.getNav()
+  res.render("index", {title: "Home", nav})
+}))
 
-// ✅ INVENTORY ROUTES NEXT
-app.use("/inv", inventoryRoute);
+// Inventory routes
+app.use("/inv", inventoryRoute)
 
-// ✅ 404 ROUTE MUST BE LAST
+// Error route for testing - accessible via footer link
+app.get("/error", utilities.handleErrors(async function(req, res) {
+  // This route intentionally throws an error for testing
+  throw new Error("This is an intentional error for testing purposes")
+}))
+
+/* ***********************
+ * File Not Found Route
+ * Must be last route
+ *************************/
 app.use(async (req, res, next) => {
-  next({ status: 404, message: "Sorry, we appear to have lost that page." });
-});
+  next({status: 404, message: 'Sorry, we appear to have lost that page.'})
+})
 
 /* ***********************
 * Express Error Handler
@@ -46,6 +50,7 @@ app.use(async (err, req, res, next) => {
   let nav = await utilities.getNav()
   console.error(`Error at: "${req.originalUrl}": ${err.message}`)
   
+  let message
   if(err.status == 404){ 
     message = err.message
   } else {
@@ -55,7 +60,8 @@ app.use(async (err, req, res, next) => {
   res.status(err.status || 500).render("errors/error", {
     title: err.status || 'Server Error',
     message,
-    nav
+    nav,
+    error: err
   })
 })
 
@@ -63,12 +69,12 @@ app.use(async (err, req, res, next) => {
  * Local Server Information
  * Values from .env (environment) file
  *************************/
-const port = process.env.PORT || 3000;
-const host = process.env.HOST || "0.0.0.0";
+const port = process.env.PORT
+const host = process.env.HOST
 
 /* ***********************
  * Log statement to confirm server operation
  *************************/
-app.listen(port, host, () => {
-  console.log(`app listening on ${host}:${port}`);
-});
+app.listen(port, () => {
+  console.log(`app listening on ${host}:${port}`)
+})

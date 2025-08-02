@@ -17,5 +17,8 @@ router.post("/login", utilities.handleErrors(accountController.accountLogin));
 
 // Process logout
 router.get("/logout", utilities.handleErrors(accountController.accountLogout));
+// /routes/inventoryRoute.js
+router.get("/detail/:inv_id", invController.buildByInventoryId);
+
 
 module.exports = router;
