@@ -9,6 +9,7 @@ const static = require("./routes/static")
 const inventoryRoute = require("./routes/inventoryRoute")
 const utilities = require("./utilities/")
 const accountRoute = require("./routes/accountRoute")
+const bodyParser = require("body-parser")
 
 
 
@@ -20,6 +21,8 @@ const accountRoute = require("./routes/accountRoute")
 /* ***********************
  * Middleware
  * ************************/
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
  app.use(session({
   store: new (require('connect-pg-simple')(session))({
     createTableIfMissing: true,

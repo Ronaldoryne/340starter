@@ -612,4 +612,111 @@ footer nav ul li a:hover {
   color: #6c757d;
   font-style: italic;
 }
+/* Basic styling for the registration form */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-container input {
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.toggle-password {
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.toggle-password:hover {
+  background-color: #e9ecef;
+}
+
+.password-requirements {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.password-requirements ul {
+  margin: 0.5rem 0 0 1.5rem;
+}
+
+.password-requirements li {
+  margin-bottom: 0.25rem;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.register-btn:hover {
+  background-color: #00b315;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.error-messages {
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: #046139;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .password-container {
+    flex-direction: column;
+  }
+  
+  .password-container input {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .toggle-password {
+    width: 100%;
+  }
+}
 }

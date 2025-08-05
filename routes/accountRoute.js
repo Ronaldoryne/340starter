@@ -2,6 +2,8 @@ const express = require("express")
 const router = new express.Router() 
 const accountController = require("../controllers/accountController")
 const utilities = require("../utilities/")
+// Route to build registration view
+router.get("/register", utilities.handleErrors(accountController.buildRegister))
 
 // Route to build login view
 router.get("/login", utilities.handleErrors(accountController.buildLogin));
@@ -10,7 +12,7 @@ router.get("/login", utilities.handleErrors(accountController.buildLogin));
 router.get("/register", utilities.handleErrors(accountController.buildRegister));
 
 // Process registration
-router.post("/register", utilities.handleErrors(accountController.registerAccount));
+// router.post("/register", utilities.handleErrors(accountController.registerAccount));
 
 // Process login attempt
 router.post("/login", utilities.handleErrors(accountController.accountLogin));
