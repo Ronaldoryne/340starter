@@ -6,11 +6,11 @@ const accountModel = require("../models/account-model")
 * *************************************** */
 async function buildLogin(req, res, next) {
   let nav = await utilities.getNav()
-  let message = req.flash("notice") // ✅ Fixed key to match flash notice
+  let message = req.flash("notice")  // always returns an array
   res.render("account/login", {
     title: "Login",
     nav,
-    message,
+    message,   // passing array to view
     errors: null,
   })
 }
@@ -20,10 +20,12 @@ async function buildLogin(req, res, next) {
 * *************************************** */
 async function buildRegister(req, res, next) {
   let nav = await utilities.getNav()
+  let message = req.flash("notice")  // fixed: retrieve flash message
   res.render("account/register", {
     title: "Register",
     nav,
-    errors: null
+    message,   // pass message array to view
+    errors: null,
   })
 }
 
@@ -46,21 +48,15 @@ async function registerAccount(req, res) {
       "notice",
       `Congratulations, you're registered ${account_firstname}. Please log in.`
     )
-    res.status(201).render("account/login", {
-      title: "Login",
-      nav,
-      message: req.flash("notice"), // ✅ include message when rendering after registration
-      errors: null
-    })
+    res.status(201).redirect("/account/login")  // redirect to use flash on new request
   } else {
     req.flash("notice", "Sorry, the registration failed.")
-    res.status(501).render("account/register", {
-      title: "Registration",
-      nav,
-      message: req.flash("notice"),
-      errors: null
-    })
+    res.status(501).redirect("/account/register") // same here
   }
 }
 
-module.exports = { buildLogin, buildRegister, registerAccount }
+module.exports = {
+  buildLogin,
+  buildRegister,
+  registerAccount
+}

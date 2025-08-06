@@ -719,4 +719,23 @@ footer nav ul li a:hover {
     width: 100%;
   }
 }
+input:required:invalid {
+  border: 2px solid #e74c3c; /* red outline for invalid */
+}
+input:required:valid {
+  border: 2px solid #2ecc71; /* green outline for valid */
+}
+.password-requirements {
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 0.5em;
+}
+.notice {
+  background-color: #f6f6f6;
+  color: #333;
+  padding: 1em;
+  border-left: 4px solid #007acc;
+  margin-bottom: 1em;
+}
+
 }
