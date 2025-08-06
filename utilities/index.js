@@ -1,3 +1,4 @@
+// utilities/index.js
 const invModel = require("../models/inventory-model")
 const Util = {}
 
@@ -60,22 +61,25 @@ Util.buildClassificationGrid = async function(data){
 /* **************************************
 * Build the vehicle detail view HTML
 * ************************************ */
-Util.buildVehicleDetail = async function(vehicle){
-  let detail = '<div class="vehicle-detail">'
-  detail += '<div class="vehicle-image">'
-  detail += '<img src="' + vehicle.inv_image 
-  + '" alt="Image of ' + vehicle.inv_make + ' ' + vehicle.inv_model + '">'
-  detail += '</div>'
-  detail += '<div class="vehicle-info">'
-  detail += '<h2>' + vehicle.inv_make + ' ' + vehicle.inv_model + '</h2>'
-  detail += '<p class="price">Price: $' + new Intl.NumberFormat('en-US').format(vehicle.inv_price) + '</p>'
-  detail += '<p><strong>Year:</strong> ' + vehicle.inv_year + '</p>'
-  detail += '<p><strong>Mileage:</strong> ' + new Intl.NumberFormat('en-US').format(vehicle.inv_miles) + ' miles</p>'
-  detail += '<p><strong>Color:</strong> ' + vehicle.inv_color + '</p>'
-  detail += '<p><strong>Description:</strong> ' + vehicle.inv_description + '</p>'
-  detail += '</div>'
-  detail += '</div>'
-  return detail
+Util.buildVehicleDetail = async function(data){
+  if(data.length > 0){
+    const vehicle = data[0]
+    let detailHTML = '<div class="vehicle-detail">'
+    detailHTML += '<div class="vehicle-image">'
+    detailHTML += '<img src="' + vehicle.inv_image + '" alt="Image of ' + vehicle.inv_make + ' ' + vehicle.inv_model + '">'
+    detailHTML += '</div>'
+    detailHTML += '<div class="vehicle-info">'
+    detailHTML += '<h2>' + vehicle.inv_make + ' ' + vehicle.inv_model + ' Details</h2>'
+    detailHTML += '<p><strong>Price:</strong> $' + new Intl.NumberFormat('en-US').format(vehicle.inv_price) + '</p>'
+    detailHTML += '<p><strong>Description:</strong> ' + vehicle.inv_description + '</p>'
+    detailHTML += '<p><strong>Color:</strong> ' + vehicle.inv_color + '</p>'
+    detailHTML += '<p><strong>Miles:</strong> ' + new Intl.NumberFormat('en-US').format(vehicle.inv_miles) + '</p>'
+    detailHTML += '</div>'
+    detailHTML += '</div>'
+    return detailHTML
+  } else {
+    return '<p class="notice">Sorry, no matching vehicle could be found.</p>'
+  }
 }
 
 /* ****************************************

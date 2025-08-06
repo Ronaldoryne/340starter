@@ -1,26 +1,20 @@
 const utilities = require("../utilities")
-
 const accountModel = require("../models/account-model")
-
-
 
 /* ****************************************
 *  Deliver login view
 * *************************************** */
 async function buildLogin(req, res, next) {
   let nav = await utilities.getNav()
-  let message = req.flash("message") // ✅ Add this to retrieve any flash messages
+  let message = req.flash("notice") // ✅ Fixed key to match flash notice
   res.render("account/login", {
     title: "Login",
     nav,
-    message, // ✅ Pass message to the view
+    message,
     errors: null,
   })
 }
 
-module.exports = {
-  buildLogin,
-}
 /* ****************************************
 *  Deliver registration view
 * *************************************** */
@@ -50,20 +44,23 @@ async function registerAccount(req, res) {
   if (regResult) {
     req.flash(
       "notice",
-      `Congratulations, you\'re registered ${account_firstname}. Please log in.`
+      `Congratulations, you're registered ${account_firstname}. Please log in.`
     )
     res.status(201).render("account/login", {
       title: "Login",
       nav,
+      message: req.flash("notice"), // ✅ include message when rendering after registration
+      errors: null
     })
   } else {
     req.flash("notice", "Sorry, the registration failed.")
     res.status(501).render("account/register", {
       title: "Registration",
       nav,
+      message: req.flash("notice"),
+      errors: null
     })
   }
 }
 
-// Update your module.exports to include both functions
-module.exports = { buildLogin, buildRegister }
+module.exports = { buildLogin, buildRegister, registerAccount }

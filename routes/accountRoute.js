@@ -12,13 +12,15 @@ router.get("/login", utilities.handleErrors(accountController.buildLogin));
 router.get("/register", utilities.handleErrors(accountController.buildRegister));
 
 // Process registration
-// router.post("/register", utilities.handleErrors(accountController.registerAccount));
+ router.post("/register", utilities.handleErrors(accountController.registerAccount));
 
 // Process login attempt
 router.post("/login", utilities.handleErrors(accountController.accountLogin));
 
 // Process logout
 router.get("/logout", utilities.handleErrors(accountController.accountLogout));
+// Route to process registration form submission
+router.post("/register", utilities.handleErrors(accountController.registerAccount))
 
 
 
