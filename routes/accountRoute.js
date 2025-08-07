@@ -24,4 +24,12 @@ router.post("/login", utilities.handleErrors(accountController.accountLogin));
 // Process logout
 router.get("/logout", utilities.handleErrors(accountController.accountLogout));
 
+// Process the login attempt
+router.post(
+  "/login",
+  (req, res) => {
+    res.status(200).send('login process')
+  }
+)
+
 module.exports = router;
