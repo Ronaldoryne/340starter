@@ -1,4 +1,3 @@
-// utilities/index.js
 const invModel = require("../models/inventory-model")
 const Util = {}
 
@@ -59,27 +58,50 @@ Util.buildClassificationGrid = async function(data){
 }
 
 /* **************************************
-* Build the vehicle detail view HTML
+* Build the detail view HTML
 * ************************************ */
-Util.buildVehicleDetail = async function(data){
+Util.buildDetailGrid = async function(data){
+  let grid
   if(data.length > 0){
     const vehicle = data[0]
-    let detailHTML = '<div class="vehicle-detail">'
-    detailHTML += '<div class="vehicle-image">'
-    detailHTML += '<img src="' + vehicle.inv_image + '" alt="Image of ' + vehicle.inv_make + ' ' + vehicle.inv_model + '">'
-    detailHTML += '</div>'
-    detailHTML += '<div class="vehicle-info">'
-    detailHTML += '<h2>' + vehicle.inv_make + ' ' + vehicle.inv_model + ' Details</h2>'
-    detailHTML += '<p><strong>Price:</strong> $' + new Intl.NumberFormat('en-US').format(vehicle.inv_price) + '</p>'
-    detailHTML += '<p><strong>Description:</strong> ' + vehicle.inv_description + '</p>'
-    detailHTML += '<p><strong>Color:</strong> ' + vehicle.inv_color + '</p>'
-    detailHTML += '<p><strong>Miles:</strong> ' + new Intl.NumberFormat('en-US').format(vehicle.inv_miles) + '</p>'
-    detailHTML += '</div>'
-    detailHTML += '</div>'
-    return detailHTML
-  } else {
-    return '<p class="notice">Sorry, no matching vehicle could be found.</p>'
+    grid = '<div class="vehicle-detail">'
+    grid += '<div class="vehicle-image">'
+    grid += '<img src="' + vehicle.inv_image + '" alt="' + vehicle.inv_make + ' ' + vehicle.inv_model + '">'
+    grid += '</div>'
+    grid += '<div class="vehicle-info">'
+    grid += '<h2>' + vehicle.inv_year + ' ' + vehicle.inv_make + ' ' + vehicle.inv_model + '</h2>'
+    grid += '<p><strong>Price:</strong> $' + new Intl.NumberFormat('en-US').format(vehicle.inv_price) + '</p>'
+    grid += '<p><strong>Description:</strong> ' + vehicle.inv_description + '</p>'
+    grid += '<p><strong>Color:</strong> ' + vehicle.inv_color + '</p>'
+    grid += '<p><strong>Miles:</strong> ' + new Intl.NumberFormat('en-US').format(vehicle.inv_miles) + '</p>'
+    grid += '</div>'
+    grid += '</div>'
+  } else { 
+    grid = '<p class="notice">Sorry, no matching vehicle could be found.</p>'
   }
+  return grid
+}
+
+/* **************************************
+* Build classification list for select dropdown
+* ************************************ */
+Util.buildClassificationList = async function (classification_id = null) {
+  let data = await invModel.getClassifications()
+  let classificationList =
+    '<select name="classification_id" id="classificationList" required>'
+  classificationList += "<option value=''>Choose a Classification</option>"
+  data.rows.forEach((row) => {
+    classificationList += '<option value="' + row.classification_id + '"'
+    if (
+      classification_id != null &&
+      row.classification_id == classification_id
+    ) {
+      classificationList += " selected "
+    }
+    classificationList += ">" + row.classification_name + "</option>"
+  })
+  classificationList += "</select>"
+  return classificationList
 }
 
 /* ****************************************
