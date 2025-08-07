@@ -19,15 +19,16 @@ async function buildLogin(req, res, next) {
 *  Deliver registration view
 * *************************************** */
 async function buildRegister(req, res, next) {
-  let nav = await utilities.getNav()
-  let message = req.flash("notice")  // fixed: retrieve flash message
+  let nav = await utilities.getNav();
+  let message = req.flash("notice"); // Optional: include flash messages
   res.render("account/register", {
     title: "Register",
     nav,
-    message,   // pass message array to view
-    errors: null,
-  })
+    message,
+    errors: null, // ✅ Add this line
+  });
 }
+
 
 /* ****************************************
 *  Process Registration
