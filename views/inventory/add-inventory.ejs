@@ -1,18 +1,11 @@
-<% if (title) { %>
-  <% locals.title = title %>
-<% } else { 
-  locals.title = "Add New Vehicle"
-} %>
-
-<%- include('../partials/header') %>
-<%- include('../partials/navigation') %>
+<% locals.title = title || "Add New Vehicle" %>
 
 <main>
-  <h1><%= title %></h1>
-  
+  <h1><%= locals.title %></h1>
+
   <!-- Flash Messages -->
   <%- messages() %>
-  
+
   <!-- Display errors if any -->
   <% if (errors) { %>
     <ul class="notice">
@@ -21,79 +14,79 @@
       <% }) %>
     </ul>
   <% } %>
-  
+
   <form id="inventoryForm" action="/inv/add-inventory" method="post">
     <fieldset>
       <legend>Add New Vehicle</legend>
-      
+
       <div class="form-row">
         <div class="form-group">
           <label for="classification_id">Classification:</label>
           <%- classificationSelect %>
         </div>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
           <label for="inv_make">Make:</label>
           <input type="text" id="inv_make" name="inv_make" required 
                  value="<%= locals.inv_make || '' %>">
         </div>
-        
+
         <div class="form-group">
           <label for="inv_model">Model:</label>
           <input type="text" id="inv_model" name="inv_model" required 
                  value="<%= locals.inv_model || '' %>">
         </div>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
           <label for="inv_year">Year:</label>
           <input type="number" id="inv_year" name="inv_year" min="1900" max="2030" required 
                  value="<%= locals.inv_year || '' %>">
         </div>
-        
+
         <div class="form-group">
           <label for="inv_color">Color:</label>
           <input type="text" id="inv_color" name="inv_color" required 
                  value="<%= locals.inv_color || '' %>">
         </div>
       </div>
-      
+
       <div class="form-group">
         <label for="inv_description">Description:</label>
         <textarea id="inv_description" name="inv_description" rows="4" required><%= locals.inv_description || '' %></textarea>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
           <label for="inv_price">Price:</label>
           <input type="number" id="inv_price" name="inv_price" min="0" step="0.01" required 
                  value="<%= locals.inv_price || '' %>">
         </div>
-        
+
         <div class="form-group">
           <label for="inv_miles">Miles:</label>
           <input type="number" id="inv_miles" name="inv_miles" min="0" required 
                  value="<%= locals.inv_miles || '' %>">
         </div>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
           <label for="inv_image">Image Path:</label>
           <input type="text" id="inv_image" name="inv_image" required 
                  value="<%= locals.inv_image || '/images/vehicles/no-image.png' %>">
         </div>
-        
+
         <div class="form-group">
           <label for="inv_thumbnail">Thumbnail Path:</label>
           <input type="text" id="inv_thumbnail" name="inv_thumbnail" required 
                  value="<%= locals.inv_thumbnail || '/images/vehicles/no-image-tn.png' %>">
         </div>
       </div>
-      
+
       <input type="submit" value="Add Vehicle" class="btn">
     </fieldset>
   </form>
@@ -101,15 +94,14 @@
 
 <script>
 document.getElementById('inventoryForm').addEventListener('submit', function(e) {
-  // Client-side validation
   const requiredFields = [
-    'classification_id', 'inv_make', 'inv_model', 'inv_year', 
-    'inv_color', 'inv_description', 'inv_price', 'inv_miles', 
+    'classification_id', 'inv_make', 'inv_model', 'inv_year',
+    'inv_color', 'inv_description', 'inv_price', 'inv_miles',
     'inv_image', 'inv_thumbnail'
   ];
-  
+
   let isValid = true;
-  
+
   requiredFields.forEach(fieldId => {
     const field = document.getElementById(fieldId);
     if (!field.value.trim()) {
@@ -119,31 +111,28 @@ document.getElementById('inventoryForm').addEventListener('submit', function(e) 
       field.style.borderColor = '';
     }
   });
-  
-  // Validate year
+
   const year = parseInt(document.getElementById('inv_year').value);
   if (year < 1900 || year > 2030) {
     alert('Year must be between 1900 and 2030');
     e.preventDefault();
     return false;
   }
-  
-  // Validate price
+
   const price = parseFloat(document.getElementById('inv_price').value);
   if (price < 0) {
     alert('Price cannot be negative');
     e.preventDefault();
     return false;
   }
-  
-  // Validate miles
+
   const miles = parseInt(document.getElementById('inv_miles').value);
   if (miles < 0) {
     alert('Miles cannot be negative');
     e.preventDefault();
     return false;
   }
-  
+
   if (!isValid) {
     alert('Please fill in all required fields');
     e.preventDefault();
@@ -151,5 +140,3 @@ document.getElementById('inventoryForm').addEventListener('submit', function(e) 
   }
 });
 </script>
-
-<%- include('../partials/footer') %>
