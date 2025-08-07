@@ -1,0 +1,27 @@
+<% if (title) { %>
+  <% locals.title = title %>
+<% } else { 
+  locals.title = "Vehicle Management"
+} %>
+
+<%- include('../partials/header') %>
+<%- include('../partials/navigation') %>
+
+<main>
+  <h1><%= title %></h1>
+  
+  <!-- Flash Messages -->
+  <%- messages() %>
+  
+  <div class="management-container">
+    <h2>Inventory Management Tools</h2>
+    <p>Use the links below to manage vehicle classifications and inventory items.</p>
+    
+    <div class="management-links">
+      <a href="/inv/add-classification" class="btn btn-primary">Add New Classification</a>
+      <a href="/inv/add-inventory" class="btn btn-primary">Add New Vehicle</a>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

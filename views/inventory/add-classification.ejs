@@ -1,0 +1,63 @@
+<% if (title) { %>
+  <% locals.title = title %>
+<% } else { 
+  locals.title = "Add New Classification"
+} %>
+
+<%- include('../partials/header') %>
+<%- include('../partials/navigation') %>
+
+<main>
+  <h1><%= title %></h1>
+  
+  <!-- Flash Messages -->
+  <%- messages() %>
+  
+  <!-- Display errors if any -->
+  <% if (errors) { %>
+    <ul class="notice">
+      <% errors.array().forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+  
+  <form id="classificationForm" action="/inv/add-classification" method="post">
+    <fieldset>
+      <legend>Add New Classification</legend>
+      
+      <p><strong>Note:</strong> Classification name cannot contain spaces or special characters.</p>
+      
+      <label for="classification_name">Classification Name:</label>
+      <input type="text" id="classification_name" name="classification_name" 
+             pattern="^[a-zA-Z0-9]+$" 
+             title="Classification name cannot contain spaces or special characters"
+             required 
+             value="<%= locals.classification_name || '' %>">
+      
+      <input type="submit" value="Add Classification" class="btn">
+    </fieldset>
+  </form>
+</main>
+
+<script>
+document.getElementById('classificationForm').addEventListener('submit', function(e) {
+  const classificationName = document.getElementById('classification_name').value.trim();
+  
+  // Client-side validation
+  if (!classificationName) {
+    alert('Classification name is required.');
+    e.preventDefault();
+    return false;
+  }
+  
+  // Check for spaces and special characters
+  if (!/^[a-zA-Z0-9]+$/.test(classificationName)) {
+    alert('Classification name cannot contain spaces or special characters.');
+    e.preventDefault();
+    return false;
+  }
+});
+</script>
+
+<%- include('../partials/footer') %>
