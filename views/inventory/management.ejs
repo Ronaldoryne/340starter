@@ -1,22 +1,36 @@
-<% if (title) { %>
-  <% locals.title = title %>
-<% } else { 
-  locals.title = "Vehicle Management"
+<% if (!title) { 
+  title = "Account Management"
 } %>
 
 <%- include('../partials/header') %>
-<%- include('../partials/navigation') %>
+<%- nav %> <!-- If your project uses dynamic navigation from utilities.getNav() -->
 
 <main>
   <h1><%= title %></h1>
-  
+
   <!-- Flash Messages -->
-  <%- messages() %>
-  
+  <% if (messages && messages.length > 0) { %>
+    <div class="flash-messages">
+      <% messages.forEach(function(message) { %>
+        <p><%= message %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <% if (errors && errors.length > 0) { %>
+    <div class="error-messages">
+      <% errors.forEach(function(error) { %>
+        <p><%= error.msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <p>You're logged in.</p>
+
   <div class="management-container">
-    <h2>Inventory Management Tools</h2>
-    <p>Use the links below to manage vehicle classifications and inventory items.</p>
-    
+    <h2>Account Tools</h2>
+    <p>Manage your account settings and vehicle inventory (if applicable).</p>
+
     <div class="management-links">
       <a href="/inv/add-classification" class="btn btn-primary">Add New Classification</a>
       <a href="/inv/add-inventory" class="btn btn-primary">Add New Vehicle</a>
