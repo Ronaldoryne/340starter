@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<main>
+  <h1>Delete Inventory Item</h1>
+  <p>Confirm Deletion - The delete is permanent.</p>
+
+  <form action="/inv/delete" method="post">
+    <label for="inv_make">Make</label>
+    <input type="text" id="inv_make" name="inv_make" value="<%= inventory.inv_make %>" readonly>
+
+    <label for="inv_model">Model</label>
+    <input type="text" id="inv_model" name="inv_model" value="<%= inventory.inv_model %>" readonly>
+
+    <label for="inv_year">Year</label>
+    <input type="text" id="inv_year" name="inv_year" value="<%= inventory.inv_year %>" readonly>
+
+    <label for="inv_price">Price</label>
+    <input type="text" id="inv_price" name="inv_price" value="<%= inventory.inv_price %>" readonly>
+
+    <!-- Hidden input to pass inv_id -->
+    <input type="hidden" name="inv_id" value="<%= inventory.inv_id %>">
+
+    <input type="submit" value="Delete">
+  </form>
+</main>
+
+<%- include('../partials/footer') %>

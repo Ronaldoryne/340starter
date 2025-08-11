@@ -7,7 +7,6 @@ const validate = {}
  * ********************************* */
 validate.classificationRules = () => {
   return [
-    // classification_name is required and must be string
     body("classification_name")
       .trim()
       .isLength({ min: 1 })
@@ -22,59 +21,49 @@ validate.classificationRules = () => {
  * ********************************* */
 validate.inventoryRules = () => {
   return [
-    // Make is required and must be string
     body("inv_make")
       .trim()
       .isLength({ min: 3 })
       .withMessage("Please provide a valid make name."),
 
-    // Model is required and must be string
     body("inv_model")
       .trim()
       .isLength({ min: 3 })
       .withMessage("Please provide a valid model name."),
-      
-    // Year is required and must be a 4 digit number
+
     body("inv_year")
       .isNumeric()
       .isLength({ min: 4, max: 4 })
       .withMessage("Please provide a valid 4-digit year."),
-      
-    // Description is required
+
     body("inv_description")
       .trim()
       .isLength({ min: 1 })
       .withMessage("Please provide a description."),
-      
-    // Image path is required
+
     body("inv_image")
       .trim()
       .isLength({ min: 1 })
       .withMessage("Please provide an image path."),
-      
-    // Thumbnail path is required
+
     body("inv_thumbnail")
       .trim()
       .isLength({ min: 1 })
       .withMessage("Please provide a thumbnail path."),
-      
-    // Price is required and must be decimal
+
     body("inv_price")
       .isNumeric()
       .withMessage("Please provide a valid price."),
-      
-    // Miles is required and must be numeric
+
     body("inv_miles")
       .isNumeric()
       .withMessage("Please provide valid mileage."),
-      
-    // Color is required
+
     body("inv_color")
       .trim()
       .isLength({ min: 1 })
       .withMessage("Please provide a color."),
-      
-    // Classification is required
+
     body("classification_id")
       .isNumeric()
       .withMessage("Please select a classification."),
@@ -82,7 +71,7 @@ validate.inventoryRules = () => {
 }
 
 /* ******************************
- * Check data and return errors or continue to registration
+ * Check data and return errors or continue to classification addition
  * ***************************** */
 validate.checkClassificationData = async (req, res, next) => {
   const { classification_name } = req.body
@@ -128,6 +117,41 @@ validate.checkInventoryData = async (req, res, next) => {
       inv_price,
       inv_miles,
       inv_color,
+    })
+    return
+  }
+  next()
+}
+
+/* ******************************
+ * Check data and return errors or continue to inventory update
+ * ***************************** */
+validate.checkUpdateData = async (req, res, next) => {
+  const { 
+    inv_id, inv_make, inv_model, inv_year, inv_description, inv_image, 
+    inv_thumbnail, inv_price, inv_miles, inv_color, classification_id 
+  } = req.body
+  let errors = []
+  errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    let nav = await utilities.getNav()
+    let classificationSelect = await utilities.buildClassificationList(classification_id)
+    res.render("inventory/edit-inventory", {
+      errors,
+      title: `Edit ${inv_make} ${inv_model}`,
+      nav,
+      classificationSelect,
+      inv_id,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id,
     })
     return
   }

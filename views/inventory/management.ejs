@@ -1,22 +1,23 @@
-<% if (!title) { 
-  title = "Account Management"
-} %>
+<% if (!title) { title = "Account Management" } %>
 
 <%- include('../partials/header') %>
-<%- nav %> <!-- If your project uses dynamic navigation from utilities.getNav() -->
+<%- nav %> <!-- Dynamic navigation from utilities.getNav() -->
 
 <main>
   <h1><%= title %></h1>
 
-  <!-- Flash Messages -->
-  <% if (messages && messages.length > 0) { %>
+  <!-- ✅ Flash Messages -->
+  <% if (messages && typeof messages === 'object') { %>
     <div class="flash-messages">
-      <% messages.forEach(function(message) { %>
-        <p><%= message %></p>
+      <% Object.keys(messages).forEach(function(type) { %>
+        <% messages[type].forEach(function(msg) { %>
+          <p class="<%= type %>"><%= msg %></p>
+        <% }) %>
       <% }) %>
     </div>
   <% } %>
 
+  <!-- ✅ Error Messages -->
   <% if (errors && errors.length > 0) { %>
     <div class="error-messages">
       <% errors.forEach(function(error) { %>
@@ -36,6 +37,22 @@
       <a href="/inv/add-inventory" class="btn btn-primary">Add New Vehicle</a>
     </div>
   </div>
+
+  <!-- ✅ Inventory Management Section (if available) -->
+  <% if (typeof classificationSelect !== 'undefined') { %>
+    <section class="inventory-management">
+      <h2>Manage Inventory</h2>
+      <p>Select a classification from the list to see the items belonging to that classification.</p>
+
+      <div id="classificationList">
+        <%- classificationSelect %>
+      </div>
+
+      <table id="inventoryDisplay"></table>
+      <noscript>JavaScript must be enabled to use this page.</noscript>
+    </section>
+  <% } %>
 </main>
 
 <%- include('../partials/footer') %>
+<script src="/js/inventory.js"></script> <!-- ✅ JS hook for inventory table -->
