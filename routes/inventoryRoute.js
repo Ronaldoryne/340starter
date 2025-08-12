@@ -62,21 +62,21 @@ router.get(
   utilities.handleErrors(invController.buildEditInventoryView)
 );
 
-// ✅ Process inventory update attempt
+// ✅ ✅ ✅ Updated: Process inventory update attempt with dynamic ID
 router.post(
-  "/update",
+  "/update/:inventoryId",
   regValidate.inventoryRules(),
   regValidate.checkUpdateData,
   utilities.handleErrors(invController.updateInventory)
 );
 
-// ✅ NEW: Route to build delete confirmation view
+// ✅ Route to build delete confirmation view
 router.get(
   "/delete/:inventoryId",
   utilities.handleErrors(invController.buildDeleteInventoryView)
 );
 
-// ✅ NEW: Route to process inventory deletion
+// ✅ Route to process inventory deletion
 router.post(
   "/delete",
   utilities.handleErrors(invController.deleteInventory)

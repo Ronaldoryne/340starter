@@ -29,40 +29,43 @@
   <!-- ✅ Personalized Greeting -->
   <% if (accountData && accountData.account_firstname) { %>
     <h2>Welcome <%= accountData.account_firstname %></h2>
+    <p>You're logged in.</p>
+  <% } else { %>
+    <p>Please <a href="/account/login">log in</a> to manage your account.</p>
   <% } %>
 
-  <p>You're logged in.</p>
+  <% if (accountData) { %>
+    <div class="management-container">
+      <h2>Account Tools</h2>
+      <p>Manage your account settings and vehicle inventory (if applicable).</p>
 
-  <div class="management-container">
-    <h2>Account Tools</h2>
-    <p>Manage your account settings and vehicle inventory (if applicable).</p>
+      <!-- ✅ Update Account Info Link -->
+      <% if (accountData.account_id) { %>
+        <a href="/account/edit/<%= accountData.account_id %>" class="btn btn-secondary">Update Account Info</a>
+      <% } %>
+    </div>
 
-    <!-- ✅ Update Account Info Link -->
-    <% if (accountData && accountData.account_id) { %>
-      <a href="/account/update/<%= accountData.account_id %>" class="btn btn-secondary">Update Account Info</a>
-    <% } %>
-  </div>
+    <!-- ✅ Inventory Management Section (for Employee/Admin only) -->
+    <% if (accountData.account_type === 'Employee' || accountData.account_type === 'Admin') { %>
+      <section class="inventory-management">
+        <h2>Inventory Management</h2>
+        <p>Use the tools below to manage vehicle inventory.</p>
 
-  <!-- ✅ Inventory Management Section (for Employee/Admin only) -->
-  <% if (accountData && (accountData.account_type === 'Employee' || accountData.account_type === 'Admin')) { %>
-    <section class="inventory-management">
-      <h2>Inventory Management</h2>
-      <p>Use the tools below to manage vehicle inventory.</p>
-
-      <div class="management-links">
-        <a href="/inv/add-classification" class="btn btn-primary">Add New Classification</a>
-        <a href="/inv/add-inventory" class="btn btn-primary">Add New Vehicle</a>
-      </div>
-
-      <% if (typeof classificationSelect !== 'undefined') { %>
-        <div id="classificationList">
-          <%- classificationSelect %>
+        <div class="management-links">
+          <a href="/inv/add-classification" class="btn btn-primary">Add New Classification</a>
+          <a href="/inv/add-inventory" class="btn btn-primary">Add New Vehicle</a>
         </div>
 
-        <table id="inventoryDisplay"></table>
-        <noscript>JavaScript must be enabled to use this page.</noscript>
-      <% } %>
-    </section>
+        <% if (typeof classificationSelect !== 'undefined') { %>
+          <div id="classificationList">
+            <%- classificationSelect %>
+          </div>
+
+          <table id="inventoryDisplay"></table>
+          <noscript>JavaScript must be enabled to use this page.</noscript>
+        <% } %>
+      </section>
+    <% } %>
   <% } %>
 </main>
 

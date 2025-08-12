@@ -1,133 +1,127 @@
-const session = require("express-session")
-const pool = require('./database/')
 const express = require("express")
+const session = require("express-session")
+const pgSession = require("connect-pg-simple")(session)
+const pool = require("./database")
 const expressLayouts = require("express-ejs-layouts")
 const env = require("dotenv").config()
-const app = express()
-const static = require("./routes/static")
-const inventoryRoute = require("./routes/inventoryRoute")
-const utilities = require("./utilities/")
-const accountRoute = require("./routes/accountRoute")
 const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser")
 const jwt = require("jsonwebtoken")
+const flash = require("connect-flash")
+const messages = require("express-messages")
 
-/* ***********************
- * Middleware
- * ************************/
+const app = express()
+
+// ✅ Middleware
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser())
 
-// ✅ JWT Login State Middleware
+// ✅ Session Middleware
+app.use(session({
+  store: new pgSession({
+    pool,
+    tableName: "session",
+    createTableIfMissing: true,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  name: "sessionId",
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 2, // 2 hours
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  }
+}))
+
+// ✅ JWT Login State Middleware (fixed)
 app.use((req, res, next) => {
   const token = req.cookies.jwt
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET) // ✅ Correct secret
       res.locals.loggedIn = true
-      res.locals.accountFirstName = decoded.account_firstname || decoded.firstName
-      res.locals.accountType = decoded.accountType
-      res.locals.accountId = decoded.accountId || decoded.account_id
+      res.locals.accountData = decoded // ✅ Full account info
+      res.locals.accountFirstName = decoded.account_firstname
+      res.locals.accountType = decoded.account_type
+      res.locals.accountId = decoded.account_id
     } catch (err) {
+      console.error("JWT verification failed:", err)
+      res.clearCookie("jwt") // ✅ Clear invalid token
       res.locals.loggedIn = false
       res.locals.accountFirstName = null
+      res.locals.accountData = null
     }
   } else {
     res.locals.loggedIn = false
     res.locals.accountFirstName = null
+    res.locals.accountData = null
   }
   next()
 })
 
-app.use(session({
-  store: new (require('connect-pg-simple')(session))({
-    createTableIfMissing: true,
-    pool,
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
-  name: 'sessionId',
-}))
-
-app.use(utilities.checkJWTToken)
-
-// Express Messages Middleware
-app.use(require('connect-flash')())
-app.use(function(req, res, next){
-  res.locals.messages = require('express-messages')(req, res)
+// ✅ Flash Messages
+app.use(flash())
+app.use((req, res, next) => {
+  res.locals.messages = messages(req, res)
   next()
 })
 
-/* ***********************
- * View Engine and Templates
- *************************/
+// ✅ Utilities Middleware
+const utilities = require("./utilities/")
+app.use(utilities.checkJWTToken) // Optional: if you use additional JWT checks
+
+// ✅ View Engine
 app.set("view engine", "ejs")
 app.use(expressLayouts)
-app.set("layout", "./layouts/layout") // not at views root
+app.set("layout", "./layouts/layout")
 
-/* ***********************
- * Routes
- *************************/
+// ✅ Routes
+const static = require("./routes/static")
+const inventoryRoute = require("./routes/inventoryRoute")
+const accountRoute = require("./routes/accountRoute")
+
 app.use(static)
 
-// Index route
-app.get("/", utilities.handleErrors(async function(req, res) {
-  let nav = await utilities.getNav(res) // ✅ Pass res to getNav
+app.get("/", utilities.handleErrors(async (req, res) => {
+  const nav = await utilities.getNav(res)
   res.render("index", { title: "Home", nav })
 }))
 
-// Inventory routes
 app.use("/inv", inventoryRoute)
 app.use("/account", accountRoute)
 
-// Error route for testing - accessible via footer link
-app.get("/error", utilities.handleErrors(async function(req, res) {
+app.get("/error", utilities.handleErrors(async (req, res) => {
   throw new Error("This is an intentional error for testing purposes")
 }))
 
-/* ***********************
- * File Not Found Route
- * Must be last route
- *************************/
+// ✅ 404 Handler
 app.use(async (req, res, next) => {
-  next({ status: 404, message: 'Sorry, we appear to have lost that page.' })
+  next({ status: 404, message: "Sorry, we appear to have lost that page." })
 })
 
-/* ***********************
- * Express Error Handler
- * Place after all other middleware
- *************************/
+// ✅ Global Error Handler
 app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav(res) // ✅ Pass res to getNav
+  const nav = await utilities.getNav(res)
   console.error(`Error at: "${req.originalUrl}": ${err.message}`)
 
-  let message
-  if (err.status == 404) {
-    message = err.message
-  } else {
-    message = 'Oh no! There was a crash. Maybe try a different route?'
-  }
+  const message = err.status === 404
+    ? err.message
+    : "Oh no! There was a crash. Maybe try a different route?"
 
   res.status(err.status || 500).render("errors/error", {
-    title: err.status || 'Server Error',
+    title: err.status || "Server Error",
     message,
     nav,
-    error: err
+    error: err,
   })
 })
 
-/* ***********************
- * Local Server Information
- * Values from .env (environment) file
- *************************/
+// ✅ Server Info
 const port = process.env.PORT
 const host = process.env.HOST
 
-/* ***********************
- * Log statement to confirm server operation
- *************************/
 app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`)
+  console.log(`App listening on ${host}:${port}`)
 })

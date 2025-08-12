@@ -1,7 +1,7 @@
-const pool = require("../database/")
+const pool = require("../database")
 
 /* *****************************
- *   Register new account
+ * Register new account
  * *************************** */
 async function registerAccount(account_firstname, account_lastname, account_email, account_password) {
   try {
@@ -23,7 +23,7 @@ async function registerAccount(account_firstname, account_lastname, account_emai
 }
 
 /* **********************
- *   Check for existing email
+ * Check for existing email
  * ********************* */
 async function checkExistingEmail(account_email) {
   try {
@@ -71,7 +71,7 @@ async function getAccountById(account_id) {
 /* *****************************
  * Update account info
  * ***************************** */
-async function updateAccount(account_id, firstName, lastName, email) {
+async function updateAccount(account_id, account_firstname, account_lastname, account_email) {
   try {
     const sql = `
       UPDATE account
@@ -80,7 +80,7 @@ async function updateAccount(account_id, firstName, lastName, email) {
           account_email = $3
       WHERE account_id = $4
       RETURNING *`
-    const result = await pool.query(sql, [firstName, lastName, email, account_id])
+    const result = await pool.query(sql, [account_firstname, account_lastname, account_email, account_id])
     return result.rows[0]
   } catch (error) {
     console.error("Update Account Error:", error.message)

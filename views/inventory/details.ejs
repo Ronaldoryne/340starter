@@ -1,10 +1,13 @@
-<% if (title) { %>
-  <% title %>
-<% } else { %>
-  <title>Vehicle Detail | CSE Motors</title>
-<% } %>
-
-<main>
-  <h1><%= title %></h1>
-  <%- vehicleDetail %>
-</main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title ? title : "Vehicle Detail | CSE Motors" %></title>
+</head>
+<body>
+  <main>
+    <h1><%= title %></h1>
+    <%- vehicleDetail %>
+  </main>
+</body>
+</html>

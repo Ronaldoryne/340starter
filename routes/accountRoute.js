@@ -1,48 +1,44 @@
 const express = require("express")
-const router = new express.Router()
+const router = express.Router()
 const accountController = require("../controllers/accountController")
-const utilities = require("../utilities/")
-const regValidate = require("../utilities/account-validation")
+const validate = require("../utilities/account-validation")
+const utilities = require("../utilities")
 
-// 🛡️ Protected Account Management View
-router.get(
-  "/",
-  utilities.checkLogin, // Middleware to ensure user is logged in
-  utilities.handleErrors(accountController.buildAccountManagement)
-)
+// ✅ Account management view
+router.get("/", utilities.handleErrors(accountController.buildAccountManagement))
 
-// 📝 Registration View
-router.get(
-  "/register",
-  utilities.handleErrors(accountController.buildRegister)
-)
+// ✅ Registration and login views
+router.get("/register", utilities.handleErrors(accountController.buildRegister))
+router.get("/login", utilities.handleErrors(accountController.buildLogin))
 
-// 🔐 Login View
-router.get(
-  "/login",
-  utilities.handleErrors(accountController.buildLogin)
-)
+// ✅ Account update form
+router.get("/update/:accountId", utilities.handleErrors(accountController.buildUpdateForm))
 
-// 📨 Process Registration
+// ✅ Process registration
 router.post(
   "/register",
-  regValidate.registrationRules(), // Add validation rules
-  regValidate.checkRegData,        // Validate and sanitize input
+  validate.registrationRules(),
+  validate.checkRegData,
   utilities.handleErrors(accountController.registerAccount)
 )
 
-// 🔑 Process Login Attempt
+// ✅ Process login
 router.post(
   "/login",
-  regValidate.loginRules(),        // Add login validation rules
-  regValidate.checkLoginData,      // Validate login input
-  utilities.handleErrors(accountController.accountLogin)
+  validate.loginRules(),
+  validate.checkLoginData,
+  utilities.handleErrors(accountController.loginAccount)
 )
 
-// 🚪 Logout Route
-router.get(
-  "/logout",
-  utilities.handleErrors(accountController.accountLogout)
+// ✅ Process account update
+router.post(
+  "/update/:accountId",
+  validate.updateRules(),         // ✅ Validation rules for update
+  validate.checkUpdateData,       // ✅ Middleware to handle errors
+  utilities.handleErrors(accountController.updateAccount)
 )
+
+// ✅ Logout route
+router.get("/logout", utilities.handleErrors(accountController.accountLogout))
 
 module.exports = router

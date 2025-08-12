@@ -149,18 +149,24 @@ async function buildEditInventoryView(req, res, next) {
 }
 
 /* ***************************
- *  Update Inventory
+ *  ✅ Updated: Process Inventory Update
  * ************************** */
 async function updateInventory(req, res, next) {
-  const invData = req.body;
+  const inv_id = parseInt(req.params.inventoryId);
+  const invData = { ...req.body, inv_id };
   const nav = await utilities.getNav(res);
-  const updateResult = await invModel.updateInventory(invData);
-  if (updateResult) {
-    req.flash("notice", "Inventory item updated successfully.");
-    res.redirect("/inv");
-  } else {
-    req.flash("notice", "Update failed.");
-    res.redirect(`/inv/edit/${invData.inv_id}`);
+
+  try {
+    const updateResult = await invModel.updateInventory(invData);
+    if (updateResult) {
+      req.flash("notice", "Inventory item updated successfully.");
+      res.redirect("/inv");
+    } else {
+      req.flash("notice", "Update failed.");
+      res.redirect(`/inv/edit/${inv_id}`);
+    }
+  } catch (error) {
+    next(error);
   }
 }
 
