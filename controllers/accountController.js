@@ -8,8 +8,8 @@ const accountModel = require("../models/account-model")
  *  Deliver login view
  * *************************************** */
 async function buildLogin(req, res) {
-  let nav = await utilities.getNav()
-  let message = req.flash("notice")
+  const nav = await utilities.getNav()
+  const message = req.flash("notice")
   res.render("account/login", {
     title: "Login",
     nav,
@@ -22,8 +22,8 @@ async function buildLogin(req, res) {
  *  Deliver registration view
  * *************************************** */
 async function buildRegister(req, res) {
-  let nav = await utilities.getNav()
-  let message = req.flash("notice")
+  const nav = await utilities.getNav()
+  const message = req.flash("notice")
   res.render("account/register", {
     title: "Register",
     nav,
@@ -36,8 +36,18 @@ async function buildRegister(req, res) {
  *  Process Registration
  * *************************************** */
 async function registerAccount(req, res) {
-  let nav = await utilities.getNav()
+  const nav = await utilities.getNav()
   const { account_firstname, account_lastname, account_email, account_password } = req.body
+
+  if (!account_password || account_password.length < 8) {
+    req.flash("notice", "Password must be at least 8 characters.")
+    return res.status(400).render("account/register", {
+      title: "Register",
+      nav,
+      message: req.flash("notice"),
+      errors: null,
+    })
+  }
 
   const hashedPassword = await bcrypt.hash(account_password, 10)
 
@@ -61,12 +71,13 @@ async function registerAccount(req, res) {
  *  Process login request
  * *************************************** */
 async function accountLogin(req, res) {
-  let nav = await utilities.getNav()
+  const nav = await utilities.getNav()
   const { account_email, account_password } = req.body
 
   try {
     const accountData = await accountModel.getAccountByEmail(account_email)
     if (!accountData) {
+      console.warn(`Failed login attempt for email: ${account_email}`)
       req.flash("notice", "Please check your credentials and try again.")
       return res.status(400).render("account/login", {
         title: "Login",
@@ -90,6 +101,7 @@ async function accountLogin(req, res) {
 
       return res.redirect("/account/")
     } else {
+      console.warn(`Incorrect password for email: ${account_email}`)
       req.flash("notice", "Please check your credentials and try again.")
       return res.status(400).render("account/login", {
         title: "Login",
@@ -100,7 +112,7 @@ async function accountLogin(req, res) {
       })
     }
   } catch (error) {
-    console.error(error)
+    console.error("Login Error:", error)
     req.flash("notice", "An unexpected error occurred. Please try again.")
     return res.status(500).render("account/login", {
       title: "Login",
@@ -116,9 +128,9 @@ async function accountLogin(req, res) {
  *  Build account management view
  * *************************************** */
 async function buildAccountManagement(req, res) {
-  let nav = await utilities.getNav()
+  const nav = await utilities.getNav()
   const accountData = await accountModel.getAccountById(res.locals.accountId)
-  res.render("account/manage", {
+  res.render("account/management", {
     title: "Account Management",
     nav,
     errors: null,
@@ -140,7 +152,7 @@ function accountLogout(req, res) {
  *  Show update form
  * *************************************** */
 async function showUpdateForm(req, res) {
-  let nav = await utilities.getNav()
+  const nav = await utilities.getNav()
   const accountData = await accountModel.getAccountById(req.params.id)
   res.render("account/update", {
     title: "Update Account",
@@ -155,8 +167,22 @@ async function showUpdateForm(req, res) {
  *  Process account info update
  * *************************************** */
 async function processUpdate(req, res) {
-  let nav = await utilities.getNav()
+  const nav = await utilities.getNav()
   const { accountId, firstName, lastName, email } = req.body
+
+  const currentAccount = await accountModel.getAccountById(accountId)
+  const emailExists = await accountModel.checkExistingEmail(email)
+
+  if (emailExists && email !== currentAccount.account_email) {
+    req.flash("notice", "Email already in use.")
+    return res.render("account/update", {
+      title: "Update Account",
+      nav,
+      account: currentAccount,
+      errors: null,
+      message: req.flash("notice"),
+    })
+  }
 
   const updateResult = await accountModel.updateAccount(accountId, firstName, lastName, email)
 
@@ -167,7 +193,7 @@ async function processUpdate(req, res) {
   }
 
   const accountData = await accountModel.getAccountById(accountId)
-  res.render("account/manage", {
+  res.render("account/management", {
     title: "Account Management",
     nav,
     accountData,
@@ -180,8 +206,21 @@ async function processUpdate(req, res) {
  *  Process password change
  * *************************************** */
 async function changePassword(req, res) {
-  let nav = await utilities.getNav()
-  const { accountId, password } = req.body
+  const nav = await utilities.getNav()
+  const accountId = res.locals.accountId
+  const { password } = req.body
+
+  if (!password || password.length < 8) {
+    req.flash("notice", "Password must be at least 8 characters.")
+    const accountData = await accountModel.getAccountById(accountId)
+    return res.render("account/update", {
+      title: "Update Account",
+      nav,
+      account: accountData,
+      errors: null,
+      message: req.flash("notice"),
+    })
+  }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -194,7 +233,7 @@ async function changePassword(req, res) {
     }
 
     const accountData = await accountModel.getAccountById(accountId)
-    res.render("account/manage", {
+    res.render("account/management", {
       title: "Account Management",
       nav,
       accountData,
@@ -202,7 +241,7 @@ async function changePassword(req, res) {
       messages: req.flash("notice"),
     })
   } catch (error) {
-    console.error(error)
+    console.error("Password Change Error:", error)
     req.flash("notice", "An error occurred while updating the password.")
     const accountData = await accountModel.getAccountById(accountId)
     res.render("account/update", {
