@@ -1,37 +1,48 @@
-const express = require("express");
-const router = new express.Router();
-const accountController = require("../controllers/accountController");
-const utilities = require("../utilities/");
-const regValidate = require("../utilities/account-validation");
+const express = require("express")
+const router = new express.Router()
+const accountController = require("../controllers/accountController")
+const utilities = require("../utilities/")
+const regValidate = require("../utilities/account-validation")
 
-// Default account management view (protected)
+// 🛡️ Protected Account Management View
 router.get(
   "/",
-  utilities.checkLogin, // <-- added middleware to protect the route
+  utilities.checkLogin, // Middleware to ensure user is logged in
   utilities.handleErrors(accountController.buildAccountManagement)
-);
+)
 
-// Route to build registration view
-router.get("/register", utilities.handleErrors(accountController.buildRegister));
+// 📝 Registration View
+router.get(
+  "/register",
+  utilities.handleErrors(accountController.buildRegister)
+)
 
-// Route to build login view
-router.get("/login", utilities.handleErrors(accountController.buildLogin));
+// 🔐 Login View
+router.get(
+  "/login",
+  utilities.handleErrors(accountController.buildLogin)
+)
 
-// Process registration
+// 📨 Process Registration
 router.post(
   "/register",
+  regValidate.registrationRules(), // Add validation rules
+  regValidate.checkRegData,        // Validate and sanitize input
   utilities.handleErrors(accountController.registerAccount)
-);
+)
 
-// Process login attempt
+// 🔑 Process Login Attempt
 router.post(
   "/login",
-  regValidate.loginRules(),
-  regValidate.checkLoginData,
+  regValidate.loginRules(),        // Add login validation rules
+  regValidate.checkLoginData,      // Validate login input
   utilities.handleErrors(accountController.accountLogin)
-);
+)
 
-// Process logout
-router.get("/logout", utilities.handleErrors(accountController.accountLogout));
+// 🚪 Logout Route
+router.get(
+  "/logout",
+  utilities.handleErrors(accountController.accountLogout)
+)
 
-module.exports = router;
+module.exports = router

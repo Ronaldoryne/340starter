@@ -11,9 +11,7 @@ const utilities = require("./utilities/")
 const accountRoute = require("./routes/accountRoute")
 const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser")
-
-
-
+const jwt = require("jsonwebtoken")
 
 /* ***********************
  * Middleware
@@ -21,7 +19,27 @@ const cookieParser = require("cookie-parser")
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(cookieParser())
- app.use(session({
+
+// JWT Login State Middleware
+app.use((req, res, next) => {
+  const token = req.cookies.jwt
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      res.locals.loggedIn = true
+      res.locals.accountFirstName = decoded.firstName
+      res.locals.accountType = decoded.accountType
+      res.locals.accountId = decoded.accountId
+    } catch (err) {
+      res.locals.loggedIn = false
+    }
+  } else {
+    res.locals.loggedIn = false
+  }
+  next()
+})
+
+app.use(session({
   store: new (require('connect-pg-simple')(session))({
     createTableIfMissing: true,
     pool,
@@ -62,8 +80,6 @@ app.get("/", utilities.handleErrors(async function(req, res) {
 // Inventory routes
 app.use("/inv", inventoryRoute)
 app.use("/account", accountRoute)
-
-
 
 // Error route for testing - accessible via footer link
 app.get("/error", utilities.handleErrors(async function(req, res) {
