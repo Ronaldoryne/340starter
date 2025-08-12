@@ -42,6 +42,10 @@
       <!-- ✅ Update Account Info Link -->
       <% if (accountData.account_id) { %>
         <a href="/account/edit/<%= accountData.account_id %>" class="btn btn-secondary">Update Account Info</a>
+        <a href="/account/change-password/<%= accountData.account_id %>" class="btn btn-outline-secondary">Change Password</a>
+        <a href="/account/logout" class="btn btn-danger">Log Out</a>
+      <% } else { %>
+        <p class="warning">Account ID missing. Please contact support.</p>
       <% } %>
     </div>
 

@@ -11,8 +11,11 @@ router.get("/", utilities.handleErrors(accountController.buildAccountManagement)
 router.get("/register", utilities.handleErrors(accountController.buildRegister))
 router.get("/login", utilities.handleErrors(accountController.buildLogin))
 
-// ✅ Account update form
+// ✅ Account update form (original route)
 router.get("/update/:accountId", utilities.handleErrors(accountController.buildUpdateForm))
+
+// ✅ Account update form (new route to match EJS link)
+router.get("/edit/:accountId", utilities.handleErrors(accountController.buildUpdateForm)) // ✅ Added
 
 // ✅ Process registration
 router.post(
@@ -33,8 +36,8 @@ router.post(
 // ✅ Process account update
 router.post(
   "/update/:accountId",
-  validate.updateRules(),         // ✅ Validation rules for update
-  validate.checkUpdateData,       // ✅ Middleware to handle errors
+  validate.updateRules(),
+  validate.checkUpdateData,
   utilities.handleErrors(accountController.updateAccount)
 )
 
