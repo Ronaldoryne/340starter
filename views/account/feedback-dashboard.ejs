@@ -1,0 +1,10 @@
+<h1>Feedback Dashboard</h1>
+<ul>
+  <% feedback.forEach(item => { %>
+    <li>
+      <strong><%= item.account_firstname %></strong> said:
+      <blockquote><%= item.feedback_text %></blockquote>
+      <small>Submitted at <%= item.submitted_at.toLocaleString() %></small>
+    </li>
+  <% }) %>
+</ul>

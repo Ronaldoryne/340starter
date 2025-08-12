@@ -9,11 +9,11 @@ const accountController = {}
 // ✅ Render account management view
 accountController.buildAccountManagement = async function (req, res) {
   const nav = await utilities.getNav(res)
-  const accountData = req.session.account // ✅ Pull from session
+  const accountData = req.session.account
   res.render("account/management", {
     title: "Account Management",
     nav,
-    accountData, // ✅ Pass correct data to EJS
+    accountData,
     message: req.flash("notice"),
     errors: [],
   })
@@ -73,7 +73,6 @@ accountController.loginAccount = async function (req, res) {
       })
     }
 
-    // ✅ Create JWT using ACCESS_TOKEN_SECRET
     const token = jwt.sign(
       {
         account_id: accountData.account_id,
@@ -85,7 +84,6 @@ accountController.loginAccount = async function (req, res) {
       { expiresIn: "2h" }
     )
 
-    // ✅ Set cookie and session
     res.cookie("jwt", token, { httpOnly: true })
     req.session.account = accountData
 
@@ -158,6 +156,44 @@ accountController.accountLogout = async function (req, res) {
   req.session.destroy(() => {
     res.redirect("/")
   })
+}
+
+// ✅ Render feedback form
+accountController.buildFeedbackForm = async function (req, res) {
+  const nav = await utilities.getNav(res)
+  res.render("account/feedback", {
+    title: "Submit Feedback",
+    nav,
+    message: req.flash("notice"),
+    errors: [],
+  })
+}
+
+// ✅ Handle feedback submission
+accountController.submitFeedback = async function (req, res) {
+  const nav = await utilities.getNav(res)
+  const accountId = req.session.account.account_id
+  const { subject, message } = req.body
+
+  try {
+    const sql = `
+      INSERT INTO feedback (account_id, subject, message)
+      VALUES ($1, $2, $3)
+    `
+    await accountModel.query(sql, [accountId, subject, message])
+
+    req.flash("notice", "Thank you for your feedback!")
+    res.redirect("/account/")
+  } catch (error) {
+    console.error("Feedback submission error:", error)
+    req.flash("notice", "Error submitting feedback. Please try again.")
+    res.status(500).render("account/feedback", {
+      title: "Submit Feedback",
+      nav,
+      message: req.flash("notice"),
+      errors: [],
+    })
+  }
 }
 
 module.exports = accountController

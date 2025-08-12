@@ -44,4 +44,10 @@ router.post(
 // ✅ Logout route
 router.get("/logout", utilities.handleErrors(accountController.accountLogout))
 
+// ✅ Feedback form view
+router.get("/feedback", utilities.handleErrors(accountController.buildFeedbackForm))
+
+// ✅ Feedback form submission
+router.post("/feedback", utilities.handleErrors(accountController.submitFeedback))
+
 module.exports = router

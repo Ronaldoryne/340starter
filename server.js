@@ -40,15 +40,15 @@ app.use((req, res, next) => {
   const token = req.cookies.jwt
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET) // ✅ Correct secret
+      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
       res.locals.loggedIn = true
-      res.locals.accountData = decoded // ✅ Full account info
+      res.locals.accountData = decoded
       res.locals.accountFirstName = decoded.account_firstname
       res.locals.accountType = decoded.account_type
       res.locals.accountId = decoded.account_id
     } catch (err) {
       console.error("JWT verification failed:", err)
-      res.clearCookie("jwt") // ✅ Clear invalid token
+      res.clearCookie("jwt")
       res.locals.loggedIn = false
       res.locals.accountFirstName = null
       res.locals.accountData = null
@@ -81,6 +81,7 @@ app.set("layout", "./layouts/layout")
 const static = require("./routes/static")
 const inventoryRoute = require("./routes/inventoryRoute")
 const accountRoute = require("./routes/accountRoute")
+const feedbackRoute = require("./routes/feedbackRoute") // ✅ Added
 
 app.use(static)
 
@@ -91,6 +92,7 @@ app.get("/", utilities.handleErrors(async (req, res) => {
 
 app.use("/inv", inventoryRoute)
 app.use("/account", accountRoute)
+app.use("/account", feedbackRoute) // ✅ Mount feedback routes under /account
 
 app.get("/error", utilities.handleErrors(async (req, res) => {
   throw new Error("This is an intentional error for testing purposes")
