@@ -1,15 +1,17 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const invModel = require("../models/inventory-model");
+
 const Util = {};
 
 /* ************************
  * Constructs the nav HTML unordered list
  ************************** */
-Util.getNav = async function () {
+Util.getNav = async function (res) {
   let data = await invModel.getClassifications(); // returns rows directly
   let list = "<ul>";
   list += '<li><a href="/" title="Home page">Home</a></li>';
+
   data.forEach((row) => {
     list += "<li>";
     list +=
@@ -22,6 +24,14 @@ Util.getNav = async function () {
       "</a>";
     list += "</li>";
   });
+
+  // ✅ Dynamic account label
+  let accountLabel = "My Account";
+  if (res.locals.loggedIn && res.locals.accountFirstName) {
+    accountLabel = `Welcome, ${res.locals.accountFirstName}`;
+  }
+
+  list += `<li><a href="/account/" title="Account page">${accountLabel}</a></li>`;
   list += "</ul>";
   return list;
 };
@@ -168,11 +178,15 @@ Util.checkJWTToken = (req, res, next) => {
           return res.redirect("/account/login");
         }
         res.locals.accountData = accountData;
-        res.locals.loggedin = 1;
+        res.locals.loggedIn = true;
+        res.locals.accountFirstName = accountData.account_firstname || accountData.firstName;
+        res.locals.accountId = accountData.account_id || accountData.accountId;
         next();
       }
     );
   } else {
+    res.locals.loggedIn = false;
+    res.locals.accountFirstName = null;
     next();
   }
 };
@@ -181,7 +195,7 @@ Util.checkJWTToken = (req, res, next) => {
  * Check Login
  **************************************** */
 Util.checkLogin = (req, res, next) => {
-  if (res.locals.loggedin) {
+  if (res.locals.loggedIn) {
     next();
   } else {
     req.flash("notice", "Please log in.");

@@ -6,8 +6,8 @@ const utilities = require("../utilities/");
  * ************************** */
 async function buildManagement(req, res, next) {
   try {
-    const nav = await utilities.getNav();
-    const inventory = await invModel.getInventoryJSON(); // You can adjust this to a custom getAllInventory() if needed
+    const nav = await utilities.getNav(res);
+    const inventory = await invModel.getInventoryJSON();
     res.render("inventory/management", {
       title: "Inventory Management",
       nav,
@@ -23,7 +23,7 @@ async function buildManagement(req, res, next) {
  *  Build Add Classification View
  * ************************** */
 async function buildAddClassification(req, res, next) {
-  const nav = await utilities.getNav();
+  const nav = await utilities.getNav(res);
   res.render("inventory/add-classification", {
     title: "Add New Classification",
     nav,
@@ -35,7 +35,7 @@ async function buildAddClassification(req, res, next) {
  *  Build Add Inventory View
  * ************************** */
 async function buildAddInventory(req, res, next) {
-  const nav = await utilities.getNav();
+  const nav = await utilities.getNav(res);
   res.render("inventory/add-inventory", {
     title: "Add New Inventory",
     nav,
@@ -48,7 +48,7 @@ async function buildAddInventory(req, res, next) {
  * ************************** */
 async function addClassification(req, res, next) {
   const { classification_name } = req.body;
-  const nav = await utilities.getNav();
+  const nav = await utilities.getNav(res);
   try {
     const result = await invModel.addClassification(classification_name);
     if (result) {
@@ -72,7 +72,7 @@ async function addClassification(req, res, next) {
  * ************************** */
 async function addInventory(req, res, next) {
   const invData = req.body;
-  const nav = await utilities.getNav();
+  const nav = await utilities.getNav(res);
   try {
     const result = await invModel.addInventory(invData);
     if (result) {
@@ -96,7 +96,7 @@ async function addInventory(req, res, next) {
  * ************************** */
 async function buildByClassificationId(req, res, next) {
   const classification_id = req.params.classificationId;
-  const nav = await utilities.getNav();
+  const nav = await utilities.getNav(res);
   const data = await invModel.getInventoryByClassificationId(classification_id);
   const grid = await utilities.buildClassificationGrid(data);
   const className = data[0]?.classification_name || "Inventory";
@@ -112,7 +112,7 @@ async function buildByClassificationId(req, res, next) {
  * ************************** */
 async function buildByInventoryId(req, res, next) {
   const inventoryId = req.params.inventoryId;
-  const nav = await utilities.getNav();
+  const nav = await utilities.getNav(res);
   const data = await invModel.getInventoryById(inventoryId);
   const detail = await utilities.buildDetailView(data);
   const itemName = `${data.inv_make} ${data.inv_model}`;
@@ -137,7 +137,7 @@ async function getInventoryJSON(req, res, next) {
  * ************************** */
 async function buildEditInventoryView(req, res, next) {
   const inv_id = parseInt(req.params.inventoryId);
-  const nav = await utilities.getNav();
+  const nav = await utilities.getNav(res);
   const inventoryData = await invModel.getInventoryById(inv_id);
   const itemName = `${inventoryData.inv_make} ${inventoryData.inv_model}`;
   res.render("inventory/edit-inventory", {
@@ -153,7 +153,7 @@ async function buildEditInventoryView(req, res, next) {
  * ************************** */
 async function updateInventory(req, res, next) {
   const invData = req.body;
-  const nav = await utilities.getNav();
+  const nav = await utilities.getNav(res);
   const updateResult = await invModel.updateInventory(invData);
   if (updateResult) {
     req.flash("notice", "Inventory item updated successfully.");
@@ -170,7 +170,7 @@ async function updateInventory(req, res, next) {
 async function buildDeleteInventoryView(req, res, next) {
   try {
     const inv_id = parseInt(req.params.inventoryId);
-    const nav = await utilities.getNav();
+    const nav = await utilities.getNav(res);
     const inventoryData = await invModel.getInventoryById(inv_id);
 
     if (!inventoryData) {

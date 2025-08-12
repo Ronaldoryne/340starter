@@ -1,4 +1,3 @@
-// ===== SERVER.JS COMPLETE FILE =====
 const session = require("express-session")
 const pool = require('./database/')
 const express = require("express")
@@ -20,21 +19,23 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(cookieParser())
 
-// JWT Login State Middleware
+// ✅ JWT Login State Middleware
 app.use((req, res, next) => {
   const token = req.cookies.jwt
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
       res.locals.loggedIn = true
-      res.locals.accountFirstName = decoded.firstName
+      res.locals.accountFirstName = decoded.account_firstname || decoded.firstName
       res.locals.accountType = decoded.accountType
-      res.locals.accountId = decoded.accountId
+      res.locals.accountId = decoded.accountId || decoded.account_id
     } catch (err) {
       res.locals.loggedIn = false
+      res.locals.accountFirstName = null
     }
   } else {
     res.locals.loggedIn = false
+    res.locals.accountFirstName = null
   }
   next()
 })
@@ -73,8 +74,8 @@ app.use(static)
 
 // Index route
 app.get("/", utilities.handleErrors(async function(req, res) {
-  let nav = await utilities.getNav()
-  res.render("index", {title: "Home", nav})
+  let nav = await utilities.getNav(res) // ✅ Pass res to getNav
+  res.render("index", { title: "Home", nav })
 }))
 
 // Inventory routes
@@ -83,7 +84,6 @@ app.use("/account", accountRoute)
 
 // Error route for testing - accessible via footer link
 app.get("/error", utilities.handleErrors(async function(req, res) {
-  // This route intentionally throws an error for testing
   throw new Error("This is an intentional error for testing purposes")
 }))
 
@@ -92,24 +92,24 @@ app.get("/error", utilities.handleErrors(async function(req, res) {
  * Must be last route
  *************************/
 app.use(async (req, res, next) => {
-  next({status: 404, message: 'Sorry, we appear to have lost that page.'})
+  next({ status: 404, message: 'Sorry, we appear to have lost that page.' })
 })
 
 /* ***********************
-* Express Error Handler
-* Place after all other middleware
-*************************/
+ * Express Error Handler
+ * Place after all other middleware
+ *************************/
 app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav()
+  let nav = await utilities.getNav(res) // ✅ Pass res to getNav
   console.error(`Error at: "${req.originalUrl}": ${err.message}`)
-  
+
   let message
-  if(err.status == 404){ 
+  if (err.status == 404) {
     message = err.message
   } else {
     message = 'Oh no! There was a crash. Maybe try a different route?'
   }
-  
+
   res.status(err.status || 500).render("errors/error", {
     title: err.status || 'Server Error',
     message,

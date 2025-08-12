@@ -8,7 +8,7 @@ const accountModel = require("../models/account-model")
  *  Deliver login view
  * *************************************** */
 async function buildLogin(req, res) {
-  const nav = await utilities.getNav()
+  const nav = await utilities.getNav(res)
   const message = req.flash("notice")
   res.render("account/login", {
     title: "Login",
@@ -22,7 +22,7 @@ async function buildLogin(req, res) {
  *  Deliver registration view
  * *************************************** */
 async function buildRegister(req, res) {
-  const nav = await utilities.getNav()
+  const nav = await utilities.getNav(res)
   const message = req.flash("notice")
   res.render("account/register", {
     title: "Register",
@@ -36,7 +36,7 @@ async function buildRegister(req, res) {
  *  Process Registration
  * *************************************** */
 async function registerAccount(req, res) {
-  const nav = await utilities.getNav()
+  const nav = await utilities.getNav(res)
   const { account_firstname, account_lastname, account_email, account_password } = req.body
 
   if (!account_password || account_password.length < 8) {
@@ -71,7 +71,7 @@ async function registerAccount(req, res) {
  *  Process login request
  * *************************************** */
 async function accountLogin(req, res) {
-  const nav = await utilities.getNav()
+  const nav = await utilities.getNav(res)
   const { account_email, account_password } = req.body
 
   try {
@@ -99,7 +99,13 @@ async function accountLogin(req, res) {
         maxAge: 3600 * 1000,
       })
 
-      return res.redirect("/account/")
+      return res.render("account/management", {
+        title: `Welcome ${accountData.account_firstname}`,
+        nav,
+        accountData,
+        errors: null,
+        messages: req.flash("notice"),
+      })
     } else {
       console.warn(`Incorrect password for email: ${account_email}`)
       req.flash("notice", "Please check your credentials and try again.")
@@ -128,10 +134,10 @@ async function accountLogin(req, res) {
  *  Build account management view
  * *************************************** */
 async function buildAccountManagement(req, res) {
-  const nav = await utilities.getNav()
+  const nav = await utilities.getNav(res)
   const accountData = await accountModel.getAccountById(res.locals.accountId)
   res.render("account/management", {
-    title: "Account Management",
+    title: `Welcome ${accountData.account_firstname}`,
     nav,
     errors: null,
     messages: req.flash("notice"),
@@ -152,7 +158,7 @@ function accountLogout(req, res) {
  *  Show update form
  * *************************************** */
 async function showUpdateForm(req, res) {
-  const nav = await utilities.getNav()
+  const nav = await utilities.getNav(res)
   const accountData = await accountModel.getAccountById(req.params.id)
   res.render("account/update", {
     title: "Update Account",
@@ -167,7 +173,7 @@ async function showUpdateForm(req, res) {
  *  Process account info update
  * *************************************** */
 async function processUpdate(req, res) {
-  const nav = await utilities.getNav()
+  const nav = await utilities.getNav(res)
   const { accountId, firstName, lastName, email } = req.body
 
   const currentAccount = await accountModel.getAccountById(accountId)
@@ -194,7 +200,7 @@ async function processUpdate(req, res) {
 
   const accountData = await accountModel.getAccountById(accountId)
   res.render("account/management", {
-    title: "Account Management",
+    title: `Welcome ${accountData.account_firstname}`,
     nav,
     accountData,
     errors: null,
@@ -206,7 +212,7 @@ async function processUpdate(req, res) {
  *  Process password change
  * *************************************** */
 async function changePassword(req, res) {
-  const nav = await utilities.getNav()
+  const nav = await utilities.getNav(res)
   const accountId = res.locals.accountId
   const { password } = req.body
 
@@ -234,7 +240,7 @@ async function changePassword(req, res) {
 
     const accountData = await accountModel.getAccountById(accountId)
     res.render("account/management", {
-      title: "Account Management",
+      title: `Welcome ${accountData.account_firstname}`,
       nav,
       accountData,
       errors: null,
